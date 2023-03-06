@@ -45,5 +45,26 @@ namespace BulkyBookWeb.Controllers
 
             return View(category);
         }
+
+        //Update
+        [HttpPut]
+        public IActionResult Update(Category category)
+        {
+            var oldCategory = _db.Categories.FirstOrDefault(x => x.Id == category.Id);
+
+            if (category != null && oldCategory != null)
+            {
+                oldCategory.Name = category.Name;
+                oldCategory.DisplayOrder = category.DisplayOrder;
+                oldCategory.CreatedDateTime = category.CreatedDateTime;
+
+                _db.Categories.Add(oldCategory);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(oldCategory);
+        }
     }
 }
