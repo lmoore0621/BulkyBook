@@ -95,15 +95,15 @@ namespace BulkyBookWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(Category obj)
         {
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
             Category category = _db.Categories.FirstOrDefault(c => c.Id == obj.Id);
 
             if (category != null) 
             {
-                if (obj ==null)
-                {
-                    return NotFound();
-                }
-
                 _db.Categories.Remove(category);
                 _db.SaveChanges();
 
