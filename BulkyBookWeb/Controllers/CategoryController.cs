@@ -46,25 +46,71 @@ namespace BulkyBookWeb.Controllers
             return View(category);
         }
 
-        //Update
-        [HttpPut]
-        public IActionResult Update(Category category)
+        //Get
+        public IActionResult Edit(int? id)
         {
-            var oldCategory = _db.Categories.FirstOrDefault(x => x.Id == category.Id);
-
-            if (category != null && oldCategory != null)
+            if (id == null || id == 0)
             {
-                oldCategory.Name = category.Name;
-                oldCategory.DisplayOrder = category.DisplayOrder;
-                oldCategory.CreatedDateTime = category.CreatedDateTime;
+                return NotFound();
+            }
 
-                _db.Categories.Add(oldCategory);
+            var category = _db.Categories.FirstOrDefault(c => c.Id == id);
+            return View(category);
+        }
+
+        //Update
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category category)
+        {
+            if (category.Name == category.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("CustomerError", "The Display Order cannot exactly match the name.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Update(category);
                 _db.SaveChanges();
 
                 return RedirectToAction("Index");
             }
 
-            return View(oldCategory);
+            return View(category);
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var category = _db.Categories.FirstOrDefault(c => c.Id == id);
+            return View(category);
+        }
+
+        //Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(Category obj)
+        {
+            Category category = _db.Categories.FirstOrDefault(c => c.Id == obj.Id);
+
+            if (category != null) 
+            {
+                if (obj ==null)
+                {
+                    return NotFound();
+                }
+
+                _db.Categories.Remove(category);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            
+            return View(category);
         }
     }
 }
